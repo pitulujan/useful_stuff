@@ -1,0 +1,88 @@
+apache con https
+
+## /etc/apache2/sites-available/app.conf
+Listen 80
+##Listen 9090
+Listen 127.0.0.1:9000
+NameVirtualHost 127.0.0.1:9000
+<VirtualHost 127.0.0.1:9000>
+  ServerName localhost
+  WSGIDaemonProcess stt_api user=lisandro_x_salemi group=lisandro_x_salemi threads=5
+  WSGIScriptAlias / /home/lisandro_x_salemi/stt_api/stt_api/stt_api.wsgi
+<Directory /home/lisandro_x_salemi/stt_api/stt_api//>
+  WSGIProcessGroup stt_api
+  WSGIApplicationGroup %{GLOBAL}
+  WSGIScriptReloading On
+  Require all granted
+</Directory>
+</VirtualHost>
+NameVirtualHost *:80
+<VirtualHost *:80>
+  ServerName 127.0.0.2
+  Redirect "/" "https://35.243.218.218/"
+</VirtualHost>
+NameVirtualHost *:443
+<VirtualHost *:443>
+  ServerName 127.0.0.2
+  SSLEngine on
+  SSLCertificateFile    /etc/apache2/certs/self-signed/apache-selfsigned.crt
+  SSLCertificateKeyFile /etc/apache2/certs/self-signed/apache-selfsigned.key
+  
+  WSGIDaemonProcess stt_app user=martin_x_lujan group=martin_x_lujan threads=5
+  WSGIScriptAlias / /home/martin_x_lujan/stt_app/stt_app.wsgi
+  <Directory /home/martin_x_lujan/stt_app//>
+    WSGIProcessGroup stt_app
+    WSGIApplicationGroup %{GLOBAL}
+    WSGIScriptReloading On
+    Require all granted
+  </Directory>
+</VirtualHost>
+
+
+
+apache sin https
+
+## /etc/apache2/sites-available/app.conf
+Listen 80
+##Listen 9090
+Listen 127.0.0.1:9000
+NameVirtualHost 127.0.0.1:9000
+<VirtualHost 127.0.0.1:9000>
+  ServerName localhost
+  WSGIDaemonProcess stt_api user=lisandro_x_salemi group=lisandro_x_salemi threads=5
+  WSGIScriptAlias / /home/lisandro_x_salemi/stt_api/stt_api/stt_api.wsgi
+<Directory /home/lisandro_x_salemi/stt_api/stt_api//>
+  WSGIProcessGroup stt_api
+  WSGIApplicationGroup %{GLOBAL}
+  WSGIScriptReloading On
+  Require all granted
+</Directory>
+</VirtualHost>
+##NameVirtualHost *:9090
+##<VirtualHost *:9090>
+##  ServerName localhost
+##  WSGIDaemonProcess stt_api user=lisandro_x_salemi group=lisandro_x_salemi threads=5
+##  WSGIScriptAlias / /home/lisandro_x_salemi/stt_api/stt_api/stt_api.wsgi
+##<Directory /home/lisandro_x_salemi/stt_api/stt_api//>
+##  WSGIProcessGroup stt_api
+##  WSGIApplicationGroup %{GLOBAL}
+##  WSGIScriptReloading On
+##  Require all granted
+##</Directory>
+##</VirtualHost>
+NameVirtualHost *:80
+<VirtualHost *:80>
+  ServerName 127.0.0.2
+  WSGIDaemonProcess stt_app user=martin_x_lujan group=martin_x_lujan threads=5
+  WSGIScriptAlias / /home/martin_x_lujan/stt_app/stt_app.wsgi
+<Directory /home/martin_x_lujan/stt_app//>
+  WSGIProcessGroup stt_app
+  WSGIApplicationGroup %{GLOBAL}
+  WSGIScriptReloading On
+  Require all granted
+</Directory>
+</VirtualHost>
+
+
+
+https://www.digitalocean.com/community/tutorials/how-to-create-a-self-signed-ssl-certificate-for-apache-in-ubuntu-16-04
