@@ -70,9 +70,9 @@ FROM (
 
                         LEFT JOIN (
                           
-                            SELECT DISTINCT UPPER(a.asset_tag) AS ASSET_TAG,
-                                            FIRST_VALUE(a.sku) OVER(PARTITION BY a.asset_tag ORDER BY a.created_date DESC ROWS UNBOUNDED PRECEDING) as sku
-                            FROM data_engineer.ams_sf_assets_input a
+                      --      SELECT DISTINCT UPPER(a.asset_tag) AS ASSET_TAG,
+                      --                      FIRST_VALUE(a.sku) OVER(PARTITION BY a.asset_tag ORDER BY a.created_date DESC ROWS UNBOUNDED PRECEDING) as sku
+                      --      FROM data_engineer.ams_sf_assets_input a
                         ) b 
                         ON UPPER(a.asset_id) = b.asset_tag
 
