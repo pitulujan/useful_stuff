@@ -46,7 +46,7 @@ airtight_sensors_history="SELECT boxid,radio_macaddress,export_date,export_hour,
 ams_rules_input='SELECT value,rule FROM data_engineer.ams_rules_input'
 ams_bat_input='SELECT wifi_mac_address,lan_mac_address,asset_tag,product,sku FROM data_engineer.ams_bat_input'
 shared_sku_master='SELECT sku,old_sku,rollup_sku_to_use,product FROM data_engineer.shared_sku_master' 
-shared_assets_history="SELECT asset_id,asset_name,type,status,cmh_id,last_pinged_at,export_date,cms_id,cms_column FROM data_engineer.shared_assets_history WHERE export_date = (SELECT value::date FROM data_engineer.ams_rules_input WHERE rule = 'Rollforward date')"
+shared_assets_history="SELECT asset_id,asset_name,type,status,cmh_id,last_pinged_at,export_date,cms_id,cms_column FROM data_engineer.shared_assets_history WHERE export_date = (SELECT value::date FROM data_engineer.ams_rules_input WHERE rule = 'Rollforward date') AND asset_name NOT IN ('\nT17105')"
 mdm_devices_history="SELECT id,asset_id,custom_rom_version,device_id,client_id,status,mac_address,ssid,created_at,installed_date,deleted_at,export_date FROM data_engineer.mdm_devices_history WHERE export_date = (SELECT value::date FROM data_engineer.ams_rules_input WHERE rule = 'Rollforward date')"
 ams_sf_assets_input='SELECT asset_tag,sku,created_date,serial_number,mac_address FROM data_engineer.ams_sf_assets_input'
 shared_mdm_custom_rom_sku_mapping='SELECT custom_rom_version FROM data_engineer.shared_mdm_custom_rom_sku_mapping'
@@ -66,4 +66,4 @@ end=time.time()
 
 print('time taken', end-start)
 
-#joblib.dump(dataframe_dic,'probando_data_con_filtro.h5')
+joblib.dump(dataframe_dic,'probando_data_con_filtro.h5')
