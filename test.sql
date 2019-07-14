@@ -26,8 +26,8 @@ SELECT DISTINCT COALESCE(c.asset_tag, d.asset_tag, a.asset_tag) AS asset_tag,
 FROM (
     SELECT
             TRIM(UPPER(CASE WHEN d.asset_tag IS NOT NULL AND a.asset_id ~ '^A[0-9]+$' THEN a.asset_id --If the airtight name is good then use it
-                    ELSE COALESCE(d.asset_tag,a.asset_id) --Else use the salesforce/airtight name. If not airtight use CMS name
-                   END)) AS asset_tag
+                            ELSE COALESCE(d.asset_tag,a.asset_id) --Else use the salesforce/airtight name. If not airtight use CMS name
+                            END)) AS asset_tag
         ,   CASE WHEN cms_column = 'client_id' THEN 'mdm'
                  WHEN cms_column = 'radio_macaddress' THEN d.source_system_name
                  WHEN cms_column = 'display_unit_id' THEN 'broadsign'
