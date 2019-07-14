@@ -24,6 +24,7 @@ def clean_asset_tags(x):
 pandas_ams_cms_input_precursor = pd.DataFrame(columns=['asset_tag','source_system','source_system_id','source_system_asset_name','product','product_use','cmh_id','device_location_status','last_pinged_at','mac_address','public_ip_address','sku','created_at','installed_date','deleted_at','reason_for_deletion','export_date'])
 
 ams_sf_assets_input.sort_values(['created_date'],ascending=False,inplace=True)
+ams_sf_assets_input.['asset_tag'].fillna('None',inplace=True)
 b=ams_sf_assets_input.groupby('asset_tag')[['sku']].first().reset_index()
 b['asset_tag']=b['asset_tag'].str.upper()
 
@@ -35,6 +36,15 @@ s3 = pd.merge(s2, d, how='left', left_on=a['asset_id'],right_on=['asset_id'],suf
 
 b=pd.concat([s3[list(mdm_devices_history.columns)],s3.sku.combine_first(s3.sku_c)],axis=1)
 b['missing_mac_address']=s3['mac_address_d']
+
+#getting c
+
+ams_sf_assets_input.sort_values(['created_date'],ascending=False,inplace=True)
+ams_sf_assets_input.['mac_address'].fillna('None',inplace=True)
+c=ams_sf_assets_input.groupby('mac_address')[['sku']].first().reset_index()
+c['mac_address']=c['mac_address'].str.upper().str.strip().str.replace(':','')
+
+
 
 
 
