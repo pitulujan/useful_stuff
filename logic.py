@@ -40,9 +40,11 @@ b['missing_mac_address']=s3['mac_address_d']
 #getting c
 
 ams_sf_assets_input.sort_values(['created_date'],ascending=False,inplace=True)
-ams_sf_assets_input.['mac_address'].fillna('None',inplace=True)
+ams_sf_assets_input['mac_address'].fillna('None',inplace=True)
 c=ams_sf_assets_input.groupby('mac_address')[['sku']].first().reset_index()
 c['mac_address']=c['mac_address'].str.upper().str.strip().str.replace(':','')
+
+broadsign_hosts_history.primary_mac_address.combine_first(broadsign_hosts_history.secondary_mac_address).str.replace(':','').str.upper().str.strip()
 
 
 
