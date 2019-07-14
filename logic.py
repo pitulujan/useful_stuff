@@ -25,13 +25,18 @@ pandas_ams_cms_input_precursor = pd.DataFrame(columns=['asset_tag','source_syste
 
 
 b=ams_sf_assets_input.sort_values(['created_date'],ascending=False).groupby('asset_tag')[['sku']].first().reset_index()
-b['asset_tag']=b['asset_tag'].apply(clean_asset_tags)
+b['asset_tag']=b['asset_tag'].str.upper()
 
 bb= pd.merge(a, b, how='left', left_on=['asset_id'],right_on=['asset_tag'])
 
-s1 = pd.merge(a, b, how='left', left_on=['asset_id'],right_on=['asset_tag'])
-s2 = pd.merge(s1, c, how='left', left_on=a['custom_rom_version'],right_on=['custom_rom_version'])
-s3 = pd.merge(s2, d, how='left', left_on=a['asset_id'],right_on=['asset_id'])
+a['asset_id'] = a['asset_id'].str.upper()
+s1 = pd.merge(a, b, how='left', left_on=['asset_id'],right_on=['asset_tag'],suffixes=('_a','_b'))
+s2 = pd.merge(s1, c, how='left', left_on=a['custom_rom_version'],right_on=['custom_rom_version'],suffixes=('','_c'))
+s3 = pd.merge(s2, d, how='left', left_on=a['asset_id'],right_on=['asset_id'],suffixes=('','_d'))
+
+
+
+
 
 
 

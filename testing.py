@@ -65,10 +65,10 @@ mdm_devices_history = sqlio.read_sql_query(query_mdm_devices_history,conn)
 query_ams_sf_assets_input='SELECT asset_tag,sku,created_date,serial_number,mac_address FROM data_engineer.ams_sf_assets_input'
 ams_sf_assets_input = sqlio.read_sql_query(query_ams_sf_assets_input,conn)
 
-query_shared_mdm_custom_rom_sku_mapping='SELECT custom_rom_version FROM data_engineer.shared_mdm_custom_rom_sku_mapping'
+query_shared_mdm_custom_rom_sku_mapping='SELECT custom_rom_version,sku FROM data_engineer.shared_mdm_custom_rom_sku_mapping'
 shared_mdm_custom_rom_sku_mapping = sqlio.read_sql_query(query_shared_mdm_custom_rom_sku_mapping,conn)
 
-query_mdm_missing_mac_addresses='SELECT asset_id FROM data_engineer.mdm_missing_mac_addresses'
+query_mdm_missing_mac_addresses='SELECT asset_id,mac_address FROM data_engineer.mdm_missing_mac_addresses'
 mdm_missing_mac_addresses = sqlio.read_sql_query(query_mdm_missing_mac_addresses,conn)
 
 query_broadsign_hosts_history="SELECT name,display_unit_id,host_id,primary_mac_address,secondary_mac_address,export_date FROM data_engineer.broadsign_hosts_history WHERE export_date = (SELECT value::date FROM data_engineer.ams_rules_input WHERE rule = 'Rollforward date')"
