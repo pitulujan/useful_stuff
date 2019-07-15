@@ -17,7 +17,11 @@ ams_cms_input_history=joblib.load('ams_cms_input_history.h5')
 
 
 
-pandas_ams_cms_input_precursor = pd.DataFrame(columns=['asset_tag','source_system','source_system_id','source_system_asset_name','product','product_use','cmh_id','device_location_status','last_pinged_at','mac_address','public_ip_address','sku','created_at','installed_date','deleted_at','reason_for_deletion','export_date'])
+ams_airtight_source_system_names = pd.DataFrame()
+ams_airtight_source_system_names['source'] = airtight_sensors_history['source'].drop_duplicates()
+ams_airtight_source_system_names['source_system_name'] ='at'+airtight_sensors_history.source.rank(method='dense').astype('int').astype('str')
+ams_airtight_source_system_names.reset_index(drop=True)
+ams_airtight_source_system_names.head()
 
 ams_sf_assets_input.sort_values(['created_date'],ascending=False,inplace=True)
 ams_sf_assets_input['asset_tag'].fillna('None',inplace=True)
@@ -66,12 +70,8 @@ s3['sku'].fillna('None').replace(to_replace='None',value=None,inplace=True)
 c['sku'] = s3['sku'].apply(nullif).combine_first(s3['secondary_mac_address'].apply(case))
 
 
+FIRST_VALUE(a.asset_tag) OVER(PARTITION BY TRIM(UPPER(REPLACE(COALESCE(serial_number, mac_address),':',''))) ORDER BY created_date DESC ROWS UNBOUNDED PRECEDING) as asset_tag,
 
+ams_sf_assets_input.sort_values(['created_date'],ascending=False,inplace=True)
 
-
-
-
-
-
-
-
+b=ams_sf_assets_input.groupby(ams_sf_assets_input['serial_number'].combine_first(ams_sf_assets_input['mac_address']).str.replace(':','').str.upper().str.strip())[['sku']].first().reset_index()
