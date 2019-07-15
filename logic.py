@@ -32,7 +32,7 @@ b['asset_tag']=b['asset_tag'].str.upper()
 mdm_devices_history['asset_id'] = mdm_devices_history['asset_id'].str.upper()
 s1 = pd.merge(mdm_devices_history, b, how='left', left_on=['asset_id'],right_on=['asset_tag'],suffixes=('_a','_b'))
 s2 = pd.merge(s1, shared_mdm_custom_rom_sku_mapping, how='left', left_on=a['custom_rom_version'],right_on=['custom_rom_version'],suffixes=('','_c'))
-s3 = pd.merge(s2, d, how='left', left_on=a['asset_id'],right_on=['asset_id'],suffixes=('','_d'))
+s3 = pd.merge(s2, mdm_missing_mac_addresses, how='left', left_on=a['asset_id'],right_on=['asset_id'],suffixes=('','_d'))
 
 b=pd.concat([s3[list(mdm_devices_history.columns)],s3.sku.combine_first(s3.sku_c)],axis=1)
 b['missing_mac_address']=s3['mac_address_d']
@@ -44,6 +44,8 @@ ams_sf_assets_input['mac_address'].fillna('None',inplace=True)
 c=ams_sf_assets_input.groupby('mac_address')[['sku']].first().reset_index()
 c['mac_address']=c['mac_address'].str.upper().str.strip().str.replace(':','')
 
+s1 = pd.merge(broadsign_hosts_history, broadsign_monitor_polls_history, how='left', left_on=['host_id','export_date'],right_on=['client_resource_id','export_date'],suffixes=('_a','_b'))
+s2 = pd.merge(s1, c, how='left', left_on=[a.primary_mac_address.combine_first(a.secondary_mac_address).str.replace(':','').str.upper().str.strip()],right_on=['mac_address'],suffixes=('','_c'))
 broadsign_hosts_history.primary_mac_address.combine_first(broadsign_hosts_history.secondary_mac_address).str.replace(':','').str.upper().str.strip()
 
 
