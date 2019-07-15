@@ -24,7 +24,7 @@ def clean_asset_tags(x):
 pandas_ams_cms_input_precursor = pd.DataFrame(columns=['asset_tag','source_system','source_system_id','source_system_asset_name','product','product_use','cmh_id','device_location_status','last_pinged_at','mac_address','public_ip_address','sku','created_at','installed_date','deleted_at','reason_for_deletion','export_date'])
 
 ams_sf_assets_input.sort_values(['created_date'],ascending=False,inplace=True)
-ams_sf_assets_input.['asset_tag'].fillna('None',inplace=True)
+ams_sf_assets_input['asset_tag'].fillna('None',inplace=True)
 b=ams_sf_assets_input.groupby('asset_tag')[['sku']].first().reset_index()
 b['asset_tag']=b['asset_tag'].str.upper() #ver
 
