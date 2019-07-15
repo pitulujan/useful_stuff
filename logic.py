@@ -46,7 +46,7 @@ c['mac_address']=c['mac_address'].str.upper().str.strip().str.replace(':','')
 
 s1 = pd.merge(broadsign_hosts_history, broadsign_monitor_polls_history, how='left', left_on=['host_id','export_date'],right_on=['client_resource_id','export_date'],suffixes=('_a','_b'))
 s2 = pd.merge(s1, c, how='left', left_on=[broadsign_hosts_history.primary_mac_address.combine_first(broadsign_hosts_history.secondary_mac_address).str.replace(':','').str.upper().str.strip()],right_on=['mac_address'],suffixes=('','_c'))
-s3 = pd.merge(s2, d, how='left', left_on=[a['host_id'],a['export_date']],right_on=[d.bs_host_id.astype('int64'),'export_date'],suffixes=('','_d'))
+s3 = pd.merge(s2, ams_broadsign_migration_devices_history, how='left', left_on=[broadsign_hosts_history['host_id'],broadsign_hosts_history['export_date']],right_on=[ams_broadsign_migration_devices_history.bs_host_id.astype('int64'),'export_date'],suffixes=('','_d'))
 
 
 
