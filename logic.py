@@ -77,3 +77,6 @@ ams_sf_assets_input.sort_values(['created_date'],ascending=False,inplace=True)
 b=ams_sf_assets_input.groupby(ams_sf_assets_input['serial_number'].combine_first(ams_sf_assets_input['mac_address']).str.replace(':','').str.upper().str.strip().fillna('None'))[['asset_tag','sku']].first().reset_index()
 b=b.rename(columns={'serial_number':'mac_address'})
 
+
+b['sku']=ams_sf_assets_input.groupby('foo')[['sku']].first().reset_index()['sku']
+b['asset_tag']=ams_sf_assets_input.groupby('foo')[['asset_tag']].first().reset_index()['asset_tag']
