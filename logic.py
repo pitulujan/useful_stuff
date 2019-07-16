@@ -70,9 +70,10 @@ s3['sku'].fillna('None').replace(to_replace='None',value=None,inplace=True)
 c['sku'] = s3['sku'].apply(nullif).combine_first(s3['secondary_mac_address'].apply(case))
 
 
-FIRST_VALUE(a.asset_tag) OVER(PARTITION BY TRIM(UPPER(REPLACE(COALESCE(serial_number, mac_address),':',''))) ORDER BY created_date DESC ROWS UNBOUNDED PRECEDING) as asset_tag,
+
 
 ams_sf_assets_input.sort_values(['created_date'],ascending=False,inplace=True)
 
-b=ams_sf_assets_input.groupby(ams_sf_assets_input['serial_number'].combine_first(ams_sf_assets_input['mac_address']).str.replace(':','').str.upper().str.strip())[['sku']].first().reset_index()['sku']
-b=ams_sf_assets_input.groupby(ams_sf_assets_input['serial_number'].combine_first(ams_sf_assets_input['mac_address']).str.replace(':','').str.upper().str.strip())[['asset_tag']].first().reset_index()['asset_tag']
+b=ams_sf_assets_input.groupby(ams_sf_assets_input['serial_number'].combine_first(ams_sf_assets_input['mac_address']).str.replace(':','').str.upper().str.strip().fillna('None'))[['asset_tag','sku']].first().reset_index()
+b=b.rename(columns={'serial_number':'mac_address'})
+
