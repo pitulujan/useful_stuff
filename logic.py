@@ -20,8 +20,8 @@ ams_cms_input_history=joblib.load('ams_cms_input_history.h5')
 ams_airtight_source_system_names = pd.DataFrame()
 ams_airtight_source_system_names['source'] = airtight_sensors_history['source'].drop_duplicates()
 ams_airtight_source_system_names['source_system_name'] ='at'+airtight_sensors_history.source.rank(method='dense').astype('int').astype('str')
-ams_airtight_source_system_names.reset_index(drop=True)
-ams_airtight_source_system_names.head()
+ams_airtight_source_system_names.reset_index(drop=True,inplace=True)
+
 
 
 ams_sf_assets_input['created_date'] = ams_sf_assets_input['created_date'].apply(lambda x: datetime.date(x))
@@ -31,24 +31,32 @@ b=ams_sf_assets_input.groupby('asset_tag').agg({'sku':'first'}).reset_index()
 #b=ams_sf_assets_input.groupby('asset_tag')[['sku']].first().reset_index()
 b['asset_tag']=b['asset_tag'].str.upper() 
 
+mdm_devices_history['asset_id'].fillna('None',inplace=True)
+mdm_devices_history['asset_id']=mdm_devices_history['asset_id'].str.upper()
+mdm_missing_mac_addresses['asset_id']=mdm_missing_mac_addresses['asset_id'].str.upper()
 
 
+s1 = pd.merge(mdm_devices_history, b, how='left', left_on= ['asset_id'],right_on=['asset_tag'],suffixes=('_a','_b'))
+#s1['custom_rom_version'].fillna('None',inplace=True)
 
-s1 = pd.merge(mdm_devices_history, b, how='left', left_on= mdm_devices_history['asset_id'].str.upper(),right_on=['asset_tag'],suffixes=('_a','_b'))
-s2 = pd.merge(s1, shared_mdm_custom_rom_sku_mapping, how='left', left_on=mdm_devices_history['custom_rom_version'],right_on=['custom_rom_version'],suffixes=('','_c'))
-s3 = pd.merge(s2, mdm_missing_mac_addresses, how='left', left_on=mdm_devices_history['asset_id'],right_on=['asset_id'],suffixes=('','_d'))
+#shared_mdm_custom_rom_sku_mapping['custom_rom_version'].fillna('None',inplace=True)
+s2 = pd.merge(s1, shared_mdm_custom_rom_sku_mapping, how='left', left_on=['custom_rom_version'],right_on=['custom_rom_version'],suffixes=('','_c'))
 
+#mdm_missing_mac_addresses['asset_id'].fillna('None',inplace=True)
+s3 = pd.merge(s2, mdm_missing_mac_addresses, how='left', left_on=['asset_id'],right_on=['asset_id'],suffixes=('','_d'))
+#s3.fillna('None').replace(to_replace='None',value=None,inplace=True)
 
-b=pd.concat([s3[list(mdm_devices_history.columns)],s3.sku.combine_first(s3.sku_c)],axis=1)
+b=pd.concat([s3[list(mdm_devices_history.columns)],s3.sku_c.combine_first(s3.sku)],axis=1)
 b['missing_mac_address']=s3['mac_address_d']
 
 #getting c
 ams_sf_assets_input['created_date'] = ams_sf_assets_input['created_date'].apply(lambda x: datetime.date(x))
->>> ams_sf_assets_input = joblib.load('ams_sf_assets_input.h5')
->>> ams_sf_assets_input['created_date'] = ams_sf_assets_input['created_date'].apply(lambda x: datetime.date(x))
->>> ams_sf_assets_input.sort_values(['created_date'],ascending=False,inplace=True)
->>> ams_sf_assets_input['mac_address'].fillna('None',inplace=True)
->>> c=ams_sf_assets_input.groupby('mac_address').agg({'sku':'first'}).reset_index()
+
+ams_sf_assets_input = joblib.load('ams_sf_assets_input.h5')
+ams_sf_assets_input['created_date'] = ams_sf_assets_input['created_date'].apply(lambda x: datetime.date(x))
+ams_sf_assets_input.sort_values(['created_date'],ascending=False,inplace=True)
+ams_sf_assets_input['mac_address'].fillna('None',inplace=True)
+c=ams_sf_assets_input.groupby('mac_address').agg({'sku':'first'}).reset_index()
 
 
 s1 = pd.merge(broadsign_hosts_history, broadsign_monitor_polls_history, how='left', left_on=['host_id','export_date'],right_on=['client_resource_id','export_date'],suffixes=('_a','_b'))
