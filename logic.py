@@ -15,7 +15,7 @@ broadsign_monitor_polls_history=joblib.load('broadsign_monitor_polls_history.h5'
 ams_broadsign_migration_devices_history=joblib.load('ams_broadsign_migration_devices_history.h5')
 ams_cms_input_history=joblib.load('ams_cms_input_history.h5')
 
-
+#Getting ams_airtight_source_system_names
 
 ams_airtight_source_system_names = pd.DataFrame()
 ams_airtight_source_system_names['source'] = airtight_sensors_history['source'].drop_duplicates()
@@ -23,7 +23,7 @@ ams_airtight_source_system_names['source_system_name'] ='at'+airtight_sensors_hi
 ams_airtight_source_system_names.reset_index(drop=True,inplace=True)
 
 
-
+#Getting b
 ams_sf_assets_input['created_date'] = ams_sf_assets_input['created_date'].apply(lambda x: datetime.date(x))
 ams_sf_assets_input.sort_values(['created_date'],ascending=False,inplace=True)
 ams_sf_assets_input['asset_tag'].fillna('None',inplace=True)
