@@ -84,22 +84,39 @@ c = c.rename(columns={'poll_last_utc': 'last_pinged_at','primary_mac_address':'m
 s3['sku'].fillna('None').replace(to_replace='None',value=None,inplace=True)
 c['sku'] = s3['sku'].apply(nullif).combine_first(s3['secondary_mac_address'].apply(case))
 
+#Getting d
 
+def combine_first_str(x):
+    if x == 'None':
+        return 'P-WFI-101-MOJ-01'
+    else:
+        return x
 
+ams_sf_assets_input=joblib.load('ams_sf_assets_input.h5')
 ams_sf_assets_input['created_date'] = ams_sf_assets_input['created_date'].apply(lambda x: datetime.date(x))
 ams_sf_assets_input.sort_values(['created_date'],ascending=False,inplace=True)
 
-c=ams_sf_assets_input.groupby(ams_sf_assets_input['serial_number'].combine_first(ams_sf_assets_input['mac_address']).str.replace(':','').str.upper().str.strip().fillna('None'))[['asset_tag','sku']].agg({'asset_tag':'first','sku':'first'}).reset_index()
+ams_sf_assets_input['asset_tag'].fillna('None',inplace=True)
+
+c=ams_sf_assets_input.groupby(ams_sf_assets_input['serial_number'].combine_first(ams_sf_assets_input['mac_address']).str.replace(':','').str.upper().str.strip().fillna('None')).agg({'asset_tag':'first','sku':'first'}).reset_index().drop_duplicates()
 c=c.rename(columns={'serial_number':'mac_address'})
 
-b=ams_sf_assets_input.groupby(ams_sf_assets_input['serial_number'].combine_first(ams_sf_assets_input['mac_address']).str.replace(':','').str.upper().str.strip().fillna('None'))[['asset_tag','sku']].first().reset_index()
-b=b.rename(columns={'serial_number':'mac_address'})
+
+airtight_sensors_history['foo']=airtight_sensors_history['radio_macaddress'].str.replace(':','').str.upper().str.strip()
+airtight_sensors_history['radio_macaddress'].fillna('None',inplace=True)
+#airtight_sensors_history['export_date'] = airtight_sensors_history['export_date'].apply(lambda x: datetime.date(x)) ya esta en datetime
+airtight_sensors_history['radio_upsince'] = airtight_sensors_history['radio_upsince'].apply(lambda x: datetime.date(x))
+#airtight_sensors_history['export_hour'] = airtight_sensors_history['export_hour'].apply(lambda x: datetime.date(x)) ya esta en datetime
+
+s1=pd.merge(airtight_sensors_history,ams_airtight_source_system_names, on='source', how='inner')
 
 
 
-ams_sf_assets_input = joblib.load('ams_sf_assets_input.h5')
-ams_sf_assets_input['created_date'] = ams_sf_assets_input['created_date'].apply(lambda x: datetime.date(x))
-ams_sf_assets_input.sort_values(['created_date'],ascending=False,inplace=True)
-c=ams_sf_assets_input.groupby(ams_sf_assets_input['serial_number'].combine_first(ams_sf_assets_input['mac_address']).str.replace(':','').str.upper().str.strip().fillna('None')).agg({'sku':'first'}).reset_index()
-c['asset_tag']=ams_sf_assets_input.groupby(ams_sf_assets_input['serial_number'].combine_first(ams_sf_assets_input['mac_address']).str.replace(':','').str.upper().str.strip().fillna('None')).agg({'asset_tag':'first'}).reset_index()['asset_tag']
-c=c.rename(columns={'serial_number':'mac_address'})
+s2=pd.merge(s1,c,how='left', right_on='mac_address', left_on='foo')
+
+s2['sku'].fillna('None',inplace=True)
+s2['sku']=s2['sku'].apply(combine_first_str)
+
+s2.sort_values(['export_hour','radio_upsince'],ascending=[False,False])
+d=s2.groupby(['radio_macaddress', 'export_date']).agg({'boxid':'first','source_system_name':'first','radio_macaddress':'first','asset_tag':'first','sku':'first'}).reset_index(drop=True)
+
