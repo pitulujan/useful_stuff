@@ -120,3 +120,10 @@ s2['sku']=s2['sku'].apply(combine_first_str)
 s2.sort_values(['export_hour','radio_upsince'],ascending=[False,False])
 d=s2.groupby(['radio_macaddress', 'export_date']).agg({'boxid':'first','source_system_name':'first','radio_macaddress':'first','asset_tag':'first','sku':'first'}).reset_index(drop=True)
 
+
+#Getting the first general table a
+
+shared_assets_history=joblib.load('shared_assets_history.h5')
+
+s1=
+
