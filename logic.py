@@ -105,8 +105,8 @@ ams_sf_assets_input.sort_values(['created_date'],ascending=False,inplace=True)
 
 ams_sf_assets_input['asset_tag'].fillna('None',inplace=True)
 
-c=ams_sf_assets_input.groupby(ams_sf_assets_input['serial_number'].combine_first(ams_sf_assets_input['mac_address']).str.replace(':','').str.upper().str.strip().fillna('None')).agg({'asset_tag':'first','sku':'first'}).reset_index().drop_duplicates()
-c=c.rename(columns={'serial_number':'mac_address'})
+cc=ams_sf_assets_input.groupby(ams_sf_assets_input['serial_number'].combine_first(ams_sf_assets_input['mac_address']).str.replace(':','').str.upper().str.strip().fillna('None')).agg({'asset_tag':'first','sku':'first'}).reset_index().drop_duplicates()
+cc=cc.rename(columns={'serial_number':'mac_address'})
 
 
 airtight_sensors_history['foo']=airtight_sensors_history['radio_macaddress'].str.replace(':','').str.upper().str.strip()
@@ -119,7 +119,7 @@ s1=pd.merge(airtight_sensors_history,ams_airtight_source_system_names, on='sourc
 
 
 
-s2=pd.merge(s1,c,how='left', right_on='mac_address', left_on='foo')
+s2=pd.merge(s1,cc,how='left', right_on='mac_address', left_on='foo')
 
 s2['sku'].fillna('None',inplace=True)
 s2['sku']=s2['sku'].apply(combine_first_str)
@@ -132,18 +132,14 @@ d=s2.groupby(['radio_macaddress', 'export_date']).agg({'boxid':'first','source_s
 
 shared_assets_history=joblib.load('shared_assets_history.h5')
 
-s1=
+s1=pd.merge(shared_assets_history,b,how='left',left_on=['cms_id','export_date'],right_on=['client_id','export_date'],suffixes=('a','_b'))
+
+
+s2=pd.merge(s1,c,how='left',left_on=['asset_name','cms_id','export_date',shared_assets_history['last_pinged_at'].combine_first(shared_assets_history['last_pinged_at'].fillna('1900-01-01'))],right_on=['name',c.display_unit_id.astype('str'),'export_date',c['last_pinged_at'].combine_first(c['last_pinged_at'].fillna('1900-01-01'))],suffixes=('','_c'))
+
+s3=pd.merge(s2,d,how='left',left_on=['cms_id','export_date'],right_on=['radio_macaddress','export_date'],suffixes=('','d'))
+
+s3=s3[s3['cms_column']=='client_id' || s3['cms_column']=='display_unit_id' || s3['cms_column']=='radio_macaddress']
 
 
 
-try:
-	pass
-except Exception as e:
-	raise e
-
-try:
-	pass
-except Exception as e:
-	raise e
-else:
-	pass
