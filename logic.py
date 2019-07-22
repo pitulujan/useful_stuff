@@ -55,6 +55,7 @@ s3 = pd.merge(s2, mdm_missing_mac_addresses, how='left', left_on=['asset_id'],ri
 
 b=pd.concat([s3[list(mdm_devices_history.columns)],s3.sku_c.combine_first(s3.sku)],axis=1)
 b['missing_mac_address']=s3['mac_address_d']
+b=b.rename(columns={'sku_c':'sku'})
 
 #getting c
 ams_sf_assets_input['created_date'] = ams_sf_assets_input['created_date'].apply(lambda x: datetime.date(x))
@@ -125,7 +126,7 @@ s2['sku'].fillna('None',inplace=True)
 s2['sku']=s2['sku'].apply(combine_first_str)
 
 s2.sort_values(['export_hour','radio_upsince'],ascending=[False,False])
-d=s2.groupby(['radio_macaddress', 'export_date']).agg({'boxid':'first','source_system_name':'first','radio_macaddress':'first','asset_tag':'first','sku':'first'}).reset_index(drop=True)
+d=s2.groupby(['radio_macaddress', 'export_date']).agg({'boxid':'first','source_system_name':'first','asset_tag':'first','sku':'first'}).reset_index()
 
 
 #Getting the first general table a
@@ -137,9 +138,9 @@ s1=pd.merge(shared_assets_history,b,how='left',left_on=['cms_id','export_date'],
 
 s2=pd.merge(s1,c,how='left',left_on=['asset_name','cms_id','export_date',shared_assets_history['last_pinged_at'].combine_first(shared_assets_history['last_pinged_at'].fillna('1900-01-01'))],right_on=['name',c.display_unit_id.astype('str'),'export_date',c['last_pinged_at'].combine_first(c['last_pinged_at'].fillna('1900-01-01'))],suffixes=('','_c'))
 
-s3=pd.merge(s2,d,how='left',left_on=['cms_id','export_date'],right_on=['radio_macaddress','export_date'],suffixes=('','d'))
+s3=pd.merge(s2,d,how='left',left_on=['cms_id','export_date'],right_on=['radio_macaddress','export_date'],suffixes=('','_d'))
 
-s3=s3[s3['cms_column']=='client_id' || s3['cms_column']=='display_unit_id' || s3['cms_column']=='radio_macaddress']
+s3[s3['cms_column'].isin(["client_id","display_unit_id","radio_macaddress"])]
 
 
 
