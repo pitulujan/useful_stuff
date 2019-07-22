@@ -142,5 +142,32 @@ s3=pd.merge(s2,d,how='left',left_on=['cms_id','export_date'],right_on=['radio_ma
 
 s3=s3[s3['cms_column'].isin(["client_id","display_unit_id","radio_macaddress"])]
 
+a = s3[['asset_name','type','cmh_id','last_pinged_at','ssid','public_ip','created_at','installed_date','deleted_at','export_date']]
+a= a.rename(columns={'asset_name':'source_system_asset_name','type':'product_use','public_ip':'public_ip_address'})
+
+a['source_system'] = np.where(shared_assets_history['cms_column']=='client_id','mdm',np.where(shared_assets_history['cms_column']=='radio_macaddress',s3['source_system_name'],'broadsign'))
+
+a['source_system_id'] = np.where(shared_assets_history['cms_column']=='client_id',s3['device_id'],np.where(shared_assets_history['cms_column']=='radio_macaddress',s3['boxid'],s3['host_id']))
+
+a['product'] = np.where(s3['type'].isin(['Infusion Room Tablet','Rheumatology IRT']),'tablet',s3['type'])
+
+a['device_location_status']=np.where(s3['status_a']=='Active','Installed',np.where(s3['deleted_at'].isnull(),'Deleted',np.where(s3['status_b']=='Demo','Demo',None)))
+
+a['reason_for_deletion'] =np.where(s3['deleted_at'].notnull(),'Deleted by membership',s3['deleted_at'].astype('str'))
+
+a['sku'] = s3['sku'].combine_first(s3['sku_c']).combine_first(s3['sku_d'])
+a['mac_address']=s3.mac_address.combine_first(s3.missing_mac_address).combine_first(s3.mac_address_c).combine_first(s3.radio_macaddress).str.upper().str.strip().str.replace(':','')
+
+
+
+def search_regex(x):
+    if x:
+        if re.search('^[0-9]+$',x):
+            return True
+        else:
+            return False
+    else:
+        return False
+
 
 
