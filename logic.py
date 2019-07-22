@@ -133,14 +133,14 @@ d=s2.groupby(['radio_macaddress', 'export_date']).agg({'boxid':'first','source_s
 
 shared_assets_history=joblib.load('shared_assets_history.h5')
 
-s1=pd.merge(shared_assets_history,b,how='left',left_on=['cms_id','export_date'],right_on=['client_id','export_date'],suffixes=('a','_b'))
+s1=pd.merge(shared_assets_history,b,how='left',left_on=['cms_id','export_date'],right_on=['client_id','export_date'],suffixes=('_a','_b'))
 
 
 s2=pd.merge(s1,c,how='left',left_on=['asset_name','cms_id','export_date',shared_assets_history['last_pinged_at'].combine_first(shared_assets_history['last_pinged_at'].fillna('1900-01-01'))],right_on=['name',c.display_unit_id.astype('str'),'export_date',c['last_pinged_at'].combine_first(c['last_pinged_at'].fillna('1900-01-01'))],suffixes=('','_c'))
 
 s3=pd.merge(s2,d,how='left',left_on=['cms_id','export_date'],right_on=['radio_macaddress','export_date'],suffixes=('','_d'))
 
-s3[s3['cms_column'].isin(["client_id","display_unit_id","radio_macaddress"])]
+s3=s3[s3['cms_column'].isin(["client_id","display_unit_id","radio_macaddress"])]
 
 
 
