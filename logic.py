@@ -153,7 +153,7 @@ a['product'] = np.where(s3['type'].isin(['Infusion Room Tablet','Rheumatology IR
 
 a['device_location_status']=np.where(s3['status_a']=='Active','Installed',np.where(s3['deleted_at'].isnull(),'Deleted',np.where(s3['status_b']=='Demo','Demo',None)))
 
-a['reason_for_deletion'] =np.where(s3['deleted_at'].notnull(),'Deleted by membership',s3['deleted_at'].astype('str'))
+a['reason_for_deletion'] =np.where(s3['deleted_at'].notnull(),'Deleted by membership'.astype('str'),s3['deleted_at'])
 
 a['sku'] = s3['sku'].combine_first(s3['sku_c']).combine_first(s3['sku_d'])
 a['mac_address']=s3.mac_address.combine_first(s3.missing_mac_address).combine_first(s3.mac_address_c).combine_first(s3.radio_macaddress).str.upper().str.strip().str.replace(':','')
@@ -168,6 +168,8 @@ def search_regex(x):
             return False
     else:
         return False
+
+a['asset_tag'] = np.where((s3['asset_tag'].notnull()) & (s3['asset_id_a'].apply(search_regex)),s3['asset_id_a'],s3.asset_tag.combine_first(s3.asset_id_a)).str.upper().str.strp()
 
 
 

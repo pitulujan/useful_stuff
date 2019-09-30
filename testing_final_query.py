@@ -143,7 +143,7 @@ FROM (
 
                     INNER JOIN (    SELECT DISTINCT A.SOURCE,
                     'at'|| DENSE_RANK() OVER (ORDER BY SOURCE ASC) AS SOURCE_SYSTEM_NAME
-    FROM data_engineer.airtight_sensors_history A
+                    FROM data_engineer.airtight_sensors_history A
     WHERE A.EXPORT_DATE = (SELECT value::date FROM data_engineer.ams_rules_input WHERE rule = 'Rollforward date')) b
                     ON a.source = b.source
 

@@ -28,14 +28,14 @@ class TextToSpeech(object):
 	        'Authorization': 'Bearer ' + self.access_token,
 	        'Content-Type': 'application/ssml+xml',
 	        'X-Microsoft-OutputFormat': 'riff-24khz-16bit-mono-pcm',
-	        'User-Agent': 'martin.x.lujan@pwc.com'
+	        'User-Agent': 'bianca.s.sterpone@pwc.com'
 	    }
 	    xml_body = ElementTree.Element('speak', version='1.0')
 	    xml_body.set('{http://www.w3.org/XML/1998/namespace}lang', 'en-us')
 	    voice = ElementTree.SubElement(xml_body, 'voice')
 	    voice.set('{http://www.w3.org/XML/1998/namespace}lang', 'en-US')
-	    #voice.set('name', 'Microsoft Server Speech Text to Speech Voice (en-US, Guy24KRUS)')
-	    voice.set('name', 'Microsoft Server Speech Text to Speech Voice (en-US, Jessa24kRUS)')
+	    voice.set('name', 'Microsoft Server Speech Text to Speech Voice (en-US, Guy24KRUS)')
+	    #voice.set('name', 'Microsoft Server Speech Text to Speech Voice (en-US, Jessa24kRUS)')
 	    voice.text = self.tts
 	    body = ElementTree.tostring(xml_body)
 
@@ -56,12 +56,12 @@ class TextToSpeech(object):
 	    self.access_token = str(response.text)
 
 if __name__ == "__main__":
-    subscription_key = "70a63dee4aa64903aad34599284b3195"
+    subscription_key = "9bb8d4d4ac444c9c9a4b661e3ecb0589"
 
     
 
 
-    txt= open('article134.txt','r').read()
+    txt= open('bianca.txt','r').read()
     wrapper = textwrap.TextWrapper(width=1024)
 
     wrapped_txt = wrapper.wrap(text=txt)
