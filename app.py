@@ -4,6 +4,8 @@ from flask_httpauth import HTTPBasicAuth
 from typing import Any
 import jwt
 from time import time 
+from werkzeug.exceptions import BadRequest 
+
 
 private_key = open("jwt-key").read()
 public_key = open("jwt-key.pub").read()
@@ -31,6 +33,10 @@ tasks = [
     },
 ]
 
+class NotAuthorized(BadRequest):
+    def get_json_repr(self):
+        return str(self)
+
 
 class User:
     def __init__(self, username: str, password: str, id: int):
@@ -55,6 +61,10 @@ class User:
 pitu = User("pitu", "tuvieja", 1)
 julian = User("julian", "tuvieja", 2)
 users = [pitu, julian]
+
+@app.errorhandler(NotAuthorized)
+def respond_not_authorized(e: NotAuthorized):
+    return jsonify({"error" : e.get_json_repr()}), 400 
 
 
 @app.errorhandler(404)
@@ -94,10 +104,11 @@ def verify_auth_token(token):
 
     try:
         payload = jwt.decode(token, public_key, algorithms=["RS256"])
-    except jwt.InvalidSignatureError:
+    
+    except jwt.DecodeError:
         return None
     except jwt.ExpiredSignatureError:
-        return None
+        raise NotAuthorized("Token Expired")
 
     user = [user for user in users if user._get_id() == payload["user_id"]]
     return user
