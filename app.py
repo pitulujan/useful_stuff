@@ -1,5 +1,5 @@
 #!venv/bin/python
-from flask import Flask, jsonify, abort, make_response, g
+from flask import Flask, jsonify, abort, make_response, g, request
 from flask_httpauth import HTTPBasicAuth
 from typing import Any
 import jwt
@@ -53,7 +53,7 @@ class User:
     def _get_id(self):
         return self.id
 
-    def generate_auth_token(self, expiration=60):
+    def generate_auth_token(self, expiration=300):
         payload = {"user_id": self.id, "exp": time() + expiration}
         return jwt.encode(payload, private_key, algorithm="RS256").decode("utf-8")
 
@@ -85,19 +85,39 @@ def not_fount(error):
 
 @auth.verify_password
 def verify_password(username_or_token, password):
-    user = verify_auth_token(username_or_token)
-    if not user:
-        user = [
-            user
-            for user in users
-            if user._get_username() == username_or_token
-            and user._get_password() == password
-        ]
-        if not user:
-            # abort(401)
-            return False
-    g.user = user[0]
-    return True
+
+    auth_header =  request.headers.get("Authorization", None)
+
+    if auth_header is None:
+        abort(401)
+    token = None 
+
+    try:
+        auth_type,token = auth_header.strip().split(" ")
+        if auth_type.lower() == "basic":
+
+            user = [
+                user
+                for user in users
+                if user._get_username() == username_or_token
+                and user._get_password() == password
+            ]
+            if not user:
+                return False
+
+            g.user = user[0]
+            return True
+        
+        elif auth_type.lower() == "bearer":
+            user = verify_auth_token(token)
+            g.user = user[0]
+            return True
+        else:
+            abort(401)
+    except:
+        abort(401)
+
+
 
 
 def verify_auth_token(token):
@@ -117,7 +137,6 @@ def verify_auth_token(token):
 @app.route("/todo/api/v1.0/tasks/token", methods=["GET"])
 @auth.login_required
 def get_token():
-    print("aca llego?")
     token = g.user.generate_auth_token()
     return jsonify({"token": token})
 
