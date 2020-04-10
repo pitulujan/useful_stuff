@@ -94,28 +94,29 @@ def verify_password(username_or_token, password):
 
     try:
         auth_type,token = auth_header.strip().split(" ")
-        if auth_type.lower() == "basic":
-
-            user = [
-                user
-                for user in users
-                if user._get_username() == username_or_token
-                and user._get_password() == password
-            ]
-            if not user:
-                return False
-
-            g.user = user[0]
-            return True
-        
-        elif auth_type.lower() == "bearer":
-            user = verify_auth_token(token)
-            g.user = user[0]
-            return True
-        else:
-            abort(401)
     except:
         abort(401)
+    if auth_type.lower() == "basic":
+
+        user = [
+            user
+            for user in users
+            if user._get_username() == username_or_token
+            and user._get_password() == password
+        ]
+        if not user:
+            return False
+
+        g.user = user[0]
+        return True
+    
+    elif auth_type.lower() == "bearer":
+        user = verify_auth_token(token)
+        g.user = user[0]
+        return True
+    else:
+        abort(401)
+
 
 
 
