@@ -30,7 +30,8 @@ users = [pitu, julian]
 private_key = open("jwt-key").read()
 public_key = open("jwt-key.pub").read()
 
-
+from api.errors import bp as errors_bp
+app.register_blueprint(errors_bp)
 
 from api import routes
 

@@ -5,28 +5,12 @@ import jwt
 from time import time 
 from api import app,auth, tasks,users,private_key,public_key
 from api.models import User
-from api.api_errors import NotAuthorized
+from api.errors.api_errors import NotAuthorized
 
 
-@app.errorhandler(NotAuthorized)
-def respond_not_authorized(e: NotAuthorized):
-    return jsonify({"error" : e.get_json_repr()}), 400 
 
 
-@app.errorhandler(404)
-def not_fount(error):
-    return make_response(jsonify({"error": "Not Found Vieja"}))
 
-
-@app.errorhandler(401)
-def not_fount(error):
-    return make_response(
-        jsonify(
-            {
-                "error": "Missing or Malformed authentication. HTTP authorization header should be of the form 'Bearer [JWT]'"
-            }
-        )
-    )
 
 
 @auth.verify_password
