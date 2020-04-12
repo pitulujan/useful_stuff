@@ -14,7 +14,7 @@ def respond_not_authorized(e: NotAuthorized):
 
 @bp.app_errorhandler(404)
 def not_fount(error):
-    return make_response(jsonify({"error": "Not Found Vieja"}))
+    return make_response(jsonify({"error": "Not Found Vieja"})),400
 
 
 @bp.app_errorhandler(401)
@@ -25,4 +25,4 @@ def not_fount(error):
                 "error": "Missing or Malformed authentication. HTTP authorization header should be of the form 'Bearer [JWT]'"
             }
         )
-    )
+    ), 400
