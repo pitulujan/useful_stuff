@@ -1,20 +1,19 @@
-from werkzeug.exceptions import BadRequest 
 from api.errors import bp
 from flask import make_response,jsonify
 
 
-class NotAuthorized(BadRequest):
+class NotAuthorized(Exception):
     def get_json_repr(self):
         return str(self)
 
 @bp.app_errorhandler(NotAuthorized)
 def respond_not_authorized(e: NotAuthorized):
-    return jsonify({"error" : e.get_json_repr()}), 400 
+    return jsonify({"error" : e.get_json_repr()}), 401 
 
 
 @bp.app_errorhandler(404)
 def not_fount(error):
-    return make_response(jsonify({"error": "Not Found Vieja"})),400
+    return make_response(jsonify({"error": "Not Found Vieja"})),404
 
 
 @bp.app_errorhandler(401)
@@ -25,4 +24,4 @@ def not_fount(error):
                 "error": "Missing or Malformed authentication. HTTP authorization header should be of the form 'Bearer [JWT]'"
             }
         )
-    ), 400
+    ), 401

@@ -7,12 +7,6 @@ from api import app,auth, tasks,users,private_key,public_key
 from api.models import User
 from api.errors.api_errors import NotAuthorized
 
-
-
-
-
-
-
 @auth.verify_password
 def verify_password(username_or_token, password):
 
