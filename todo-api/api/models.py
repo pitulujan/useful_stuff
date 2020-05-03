@@ -18,6 +18,6 @@ class User:
     def _get_id(self):
         return self.id
 
-    def generate_auth_token(self, expiration=300):
+    def generate_auth_token(self, expiration=600):
         payload = {"user_id": self.id, "exp": time() + expiration}
         return jwt.encode(payload, private_key, algorithm="RS256").decode("utf-8")

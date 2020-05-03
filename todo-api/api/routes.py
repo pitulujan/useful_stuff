@@ -5,7 +5,8 @@ import jwt
 from time import time 
 from api import app,auth, tasks,users,private_key,public_key
 from api.models import User
-from api.errors.api_errors import NotAuthorized
+from api.errors.api_errors import NotAuthorized,JSONValidationError,IdNotFoundException
+from api.json_validators import iterate_properties_updatetask
 
 @auth.verify_password
 def verify_password(username_or_token, password):
@@ -96,6 +97,25 @@ def create_task():
     }
     tasks.append(task)
     return jsonify({"task": task}), 201
+
+
+@app.route('/todo/api/v1.0/tasks', methods=['PUT'])
+@auth.login_required
+def update_task():
+
+    request_json = request.get_json(force=True)
+    parse_errors = iterate_properties_updatetask(request_json)
+
+    if len(parse_errors) > 0: 
+        raise JSONValidationError(parse_errors)
+
+    task_to_update = [task for task in tasks if task["id"] == request_json['id']]
+    if len(task_to_update) == 0:
+        raise IdNotFoundException("Id not found")
+
+    task_to_update[0]["done"] = request_json["done"]
+
+    return jsonify({"task": task_to_update[0]})
 
 
 

@@ -1,5 +1,6 @@
 from api.errors import bp
 from flask import make_response,jsonify
+from typing import Iterable
 
 
 class NotAuthorized(Exception):
@@ -10,6 +11,25 @@ class NotAuthorized(Exception):
 def respond_not_authorized(e: NotAuthorized):
     return jsonify({"error" : e.get_json_repr()}), 401 
 
+class JSONValidationError(Exception):
+    def __init__(self, errors: Iterable[Exception]):
+        self.exceptions = list(errors)
+
+    def get_json_repr(self):
+        return {"errors": [x.message for x in self.exceptions]}
+
+@bp.app_errorhandler(JSONValidationError)
+def respond_not_authorized(e: JSONValidationError):
+    return jsonify( e.get_json_repr()), 400 
+
+
+class IdNotFoundException(Exception):
+    def get_json_repr(self):
+        return str(self)
+
+@bp.app_errorhandler(IdNotFoundException)
+def respond_not_authorized(e: IdNotFoundException):
+    return jsonify({"error" : e.get_json_repr()}), 400 
 
 @bp.app_errorhandler(404)
 def not_fount(error):
